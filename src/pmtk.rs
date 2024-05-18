@@ -138,22 +138,23 @@ pub mod send_pmtk {
         // For some reason there are invalid bytes in front of what should be the correct baud rate.
         // So read 200 bytes, and ditch the first 100.
         for rate in possible_baud_rates.iter() {
-            let port = open_port(port_name, *rate);
-            let mut gps = Gps { port };
-            // Try reading 5 lines.
-            for _ in 0..5 {
-                let line = gps.update();
-                match line {
-                    GpsSentence::InvalidSentence => {}
-                    GpsSentence::NoConnection => {}
-                    GpsSentence::InvalidBytes => {}
-                    _ => {
-                        gps.pmtk_220_set_nmea_updaterate("1000");
-                        let cmd = add_checksum(format!("PMTK251,{}", baud_rate));
-                        let cmd = cmd.as_bytes();
-                        let _ = gps.port.clear(ClearBuffer::Output);
-                        let _ = gps.port.write(cmd);
-                        return BaudRateResults::Success(*rate);
+            if let Ok(port) = open_port(port_name, *rate) {
+                let mut gps = Gps { port };
+                // Try reading 5 lines.
+                for _ in 0..5 {
+                    let line = gps.update();
+                    match line {
+                        GpsSentence::InvalidSentence => {}
+                        GpsSentence::NoConnection => {}
+                        GpsSentence::InvalidBytes => {}
+                        _ => {
+                            gps.pmtk_220_set_nmea_updaterate("1000");
+                            let cmd = add_checksum(format!("PMTK251,{}", baud_rate));
+                            let cmd = cmd.as_bytes();
+                            let _ = gps.port.clear(ClearBuffer::Output);
+                            let _ = gps.port.write(cmd);
+                            return BaudRateResults::Success(*rate);
+                        }
                     }
                 }
             }
@@ -396,7 +397,7 @@ pub mod send_pmtk {
                     "PMTK314,{},{},{},{},{},{},0,0,0,0,0,0,0,{}",
                     output.gll, output.rmc, output.vtg, output.gga, output.gsa, output.gsv, output.pmtkchn_interval
                 )
-                    .as_str(),
+                .as_str(),
             );
             self.pmtk_001(10)
         }
@@ -655,7 +656,7 @@ pub mod send_pmtk {
                     "PMTK223,{},{},{},{},{}",
                     run_type, run_time, sleep_time, second_run_time, second_sleep_time
                 )
-                    .as_str(),
+                .as_str(),
             );
             self.pmtk_001(10)
         }
@@ -819,7 +820,7 @@ mod pmtktests {
     fn port_setup() -> Gps {
         let _ = set_baud_rate("9600", "/dev/serial0");
         sleep(Duration::from_secs(1));
-        let port = open_port("/dev/serial0", 9600);
+        let port = open_port("/dev/serial0", 9600).unwrap();
         let mut gps = Gps { port };
         gps.pmtk_220_set_nmea_updaterate("1000");
         return gps;

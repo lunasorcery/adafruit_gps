@@ -25,7 +25,7 @@ pub mod gps {
 
     /// Opens the port to the GPS, probably /dev/serial0
         /// Default baud rate is 9600
-    pub fn open_port(port_name: &str, baud_rate: u32) -> Box<dyn SerialPort> {
+    pub fn open_port(port_name: &str, baud_rate: u32) -> serialport::Result<Box<dyn SerialPort>> {
         let settings = SerialPortSettings {
             baud_rate,
             data_bits: DataBits::Eight,
@@ -34,10 +34,7 @@ pub mod gps {
             stop_bits: StopBits::One,
             timeout: Duration::from_millis(1000),
         };
-        match serialport::open_with_settings(port_name, &settings) {
-            Ok(port) => return port,
-            Err(_e) => panic!("Port not found: {} - {}", port_name, _e),
-        }
+        serialport::open_with_settings(port_name, &settings) 
     }
 
     /// Checks if a sentence is a valid sentence by checksumming the sentence and comparing it to
@@ -106,8 +103,8 @@ pub mod gps {
     }
 
     impl Gps {
-        pub fn new(port: &str, baud_rate: &str) -> Gps {
-            Gps { port: open_port(port, baud_rate.parse().unwrap()) }
+        pub fn new(port: &str, baud_rate: &str) -> serialport::Result<Gps> {
+            Ok(Gps { port: open_port(port, baud_rate.parse().unwrap())? })
         }
 
         /// Reads a full sentence from the serial buffer, returns a String.

@@ -12,7 +12,7 @@ fn main() {
     let port = args.get(2).unwrap();
 
     // Open the port that is connected to the GPS module.
-    let mut gps = Gps::new(port, baud_rate);
+    let mut gps = Gps::new(port, baud_rate).unwrap();
 
     // gps.init() requires the update rate for the gps (1000 miliseconds (1Hz) is default)
     // It returns a hash map to tell you if setting the update rate was successful and if the

@@ -18,7 +18,7 @@ fn main() {
 
     // Then open the port to the gps and you're good.
     // Initialise the Gps.
-    let mut gps = Gps::new("/dev/serial0",  baud_rate);
+    let mut gps = Gps::new("/dev/serial0",  baud_rate).unwrap();
     let update_rate_return = gps.pmtk_220_set_nmea_updaterate(update_rate);
     println!("update rate {:?}", update_rate_return);
 
