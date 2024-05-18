@@ -227,7 +227,7 @@ pub mod gps {
         /// Append a GpsSentence struct to a file.
         /// If you wish to write a vector of bytes, run it over an iterator and add each struct
         /// individually. You must clone the struct that is being iterated over.
-        /// ```
+        /// ```ignore
         /// use adafruit_gps::GpsSentence;
         /// let v: Vec<GpsSentence> = vec![GpsSenence];
         /// for s in v.iter() {

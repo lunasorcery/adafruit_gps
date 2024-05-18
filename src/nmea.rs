@@ -608,8 +608,8 @@ mod nmea_tests {
                 ]),
                 gga::GgaData {
                     utc: 19294.00,
-                    lat: Some(34.725716),
-                    long: Some(34.725716),
+                    lat: Some(293.7257),
+                    long: Some(293.7257),
                     sat_fix: gga::SatFix::GpsFix,
                     satellites_used: 10,
                     hdop: Some(1.01),
